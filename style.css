@@ -1,0 +1,370 @@
+:root {
+    --color-background: #0a0a0a;
+    --color-surface: #1a1a1a;
+    --color-primary-text: #f5f5f5;
+    --color-secondary-text: #888;
+    --color-accent: #ffffff;
+    --color-accent-danger: #990000; /* Crimson Red for hover */
+    --color-border: #333;
+    --font-family: 'Kanit', sans-serif;
+    --shadow-light: rgba(0, 0, 0, 0.2);
+    --shadow-medium: rgba(0, 0, 0, 0.5);
+    --shadow-glow: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- General Styles --- */
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-background);
+    color: var(--color-primary-text);
+    transition: background-color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+footer {
+    width: 100%;
+    padding: 20px 0;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--color-secondary-text);
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* --- Landing Page --- */
+#landing-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+#landing-page .landing-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#landing-page .logo {
+    /* CHANGED: ปรับขนาดโลโก้ */
+    max-width: 220px; 
+    margin-bottom: 20px;
+}
+
+#landing-page h1 {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-secondary-text);
+    margin-bottom: 40px;
+}
+
+#landing-page .enter-button {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-primary-text);
+    padding: 14px 35px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px var(--shadow-light);
+}
+
+#landing-page .enter-button:hover {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+/* --- Members Page --- */
+#members-page {
+    display: none;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header .logo {
+    /* CHANGED: ปรับขนาดโลโก้ */
+    max-width: 180px; 
+}
+
+/* Search Box */
+.search-container {
+    position: relative;
+    margin-bottom: 50px;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: var(--color-secondary-text);
+}
+
+#searchInput {
+    width: 100%;
+    padding: 12px 15px 12px 45px; /* left padding for icon */
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-primary-text);
+    font-size: 16px;
+    font-family: var(--font-family);
+    transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 15px var(--shadow-glow);
+}
+
+/* Member Section & Cards */
+.member-section {
+    margin-bottom: 40px;
+}
+
+.member-section h2 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-primary-text);
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-surface);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 5px 15px var(--shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.member-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--shadow-medium);
+    border-color: var(--color-secondary-text);
+}
+
+.leader-card {
+    border-left: 3px solid var(--color-accent);
+}
+
+.member-card .profile-pic {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    border: 2px solid var(--color-border);
+    transition: border-color 0.3s ease;
+}
+
+.member-card:hover .profile-pic {
+    border-color: var(--color-accent);
+}
+
+.member-card .member-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.member-card .member-info h3 {
+    font-size: 18px;
+    font-weight: 400;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-card .member-info a {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--color-secondary-text);
+    text-decoration: none;
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-card .member-info a:hover {
+    color: var(--color-accent);
+}
+
+.member-card .profile-link {
+    font-size: 22px;
+    color: var(--color-secondary-text);
+    text-decoration: none;
+    padding: 10px;
+    margin-left: 15px;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.member-card .profile-link:hover {
+    color: var(--color-accent-danger);
+    transform: scale(1.1);
+}
+
+/* Pagination */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.pagination-controls button {
+    background-color: var(--color-surface);
+    color: var(--color-primary-text);
+    border: 1px solid var(--color-border);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background-color: var(--color-accent);
+    color: #000;
+    border-color: var(--color-accent);
+}
+
+.pagination-controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+}
+
+.pagination-controls #pageInfo {
+    margin: 0 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* --- Audio Player --- */
+#audio-player-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 50px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px var(--shadow-medium);
+    transition: all 0.3s ease;
+}
+
+.audio-btn {
+    background: none;
+    border: none;
+    color: var(--color-secondary-text);
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    padding: 5px;
+}
+
+.audio-btn:hover {
+    color: var(--color-accent);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 70px;
+    height: 4px;
+    background: var(--color-border);
+    outline: none;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--color-primary-text);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    transition: background-color 0.2s;
+}
+#volume-slider:hover::-webkit-slider-thumb {
+    background-color: var(--color-accent);
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--color-primary-text);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    transition: background-color 0.2s;
+}
+#volume-slider:hover::-moz-range-thumb {
+    background-color: var(--color-accent);
+}
