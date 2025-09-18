@@ -1,9 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
-            
-    // --- URL ของ Google Sheet ที่เผยแพร่เป็น CSV ---
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThs9RopNxmax2tjqFBvjU3QdA07hISEzwOTL9uMsfolujSimOZMN6md3mdGoq0FXZqiX6TCgqK3Os5/pub?output=csv';
 
-    // --- ส่วนควบคุมหลัก ---
+    // --- CONFIGURATION (ปรับแต่งหน้าตาและการทำงานของเว็บที่นี่) ---
+    const config = {
+        // Link ของ Google Sheet ที่เผยแพร่เป็น CSV
+        sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThs9RopNxmax2tjqFBvjU3QdA07hISEzwOTL9uMsfolujSimOZMN6md3mdGoq0FXZqiX6TCgqK3Os5/pub?output=csv',
+        
+        // จำนวนคอลัมน์ (จำนวนคนในแต่ละแถว)
+        columnsPerRow: 2,
+
+        // จำนวนสมาชิกทั้งหมดที่จะแสดงในแต่ละหน้า (จะถูกนำไปคำนวณเป็นจำนวนแถว)
+        // เช่น 15 หาร 3 คอลัมน์ = 5 แถว
+        itemsPerPage: 12 
+    };
+    // --- END CONFIGURATION ---
+
+
+    // --- Apply Layout Settings from Config ---
+    // โค้ดส่วนนี้จะนำค่าจาก config ไปสั่งให้ CSS ทำงาน
+    const memberSections = document.querySelectorAll('.member-section');
+    memberSections.forEach(section => {
+        section.style.gridTemplateColumns = `repeat(${config.columnsPerRow}, 1fr)`;
+    });
+    // --- End Apply Layout ---
+
+
     const landingPage = document.getElementById('landing-page');
     const membersPage = document.getElementById('members-page');
     const enterBtn = document.getElementById('enter-btn');
@@ -11,16 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const membersContainer = document.querySelector('#members-section');
     const loadingMessage = document.getElementById('loading-message');
 
-    let allMemberCards = []; 
-
-    // --- ฟังก์ชันสร้าง HTML สำหรับการ์ด (ดีไซน์ใหม่) ---
     function createMemberCardHTML(member, isLeader = false) {
         const cardClass = isLeader ? 'member-card leader-card' : 'member-card';
         const name = member.name || 'Unknown';
         const facebookLink = member.facebookLink || '#';
         const pictureLink = member.pictureLink || 'https://via.placeholder.com/150';
         
-        // สร้าง Short link ที่ดูดีขึ้น
         let shortLink = 'No Profile';
         if (facebookLink !== '#') {
             try {
@@ -43,11 +59,10 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
-    // --- ฟังก์ชันดึงและแสดงผลข้อมูล (ปรับปรุง) ---
     async function fetchAndDisplayMembers() {
         try {
             loadingMessage.style.display = 'block';
-            const response = await fetch(sheetUrl);
+            const response = await fetch(config.sheetUrl);
             if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
             const csvText = await response.text();
             
@@ -62,10 +77,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     role: values[2]?.trim() || '',
                     pictureLink: values[3]?.trim() || ''
                 };
-            }).filter(m => m.name); // กรองเอาเฉพาะแถวที่มีชื่อ
+            }).filter(m => m.name);
 
-            const leaders = membersData.filter(m => m.role.toLowerCase() === 'leader');
-            const members = membersData.filter(m => m.role.toLowerCase() === 'member');
+            const leaders = membersData
+                .filter(m => m.role.toLowerCase() === 'leader');
+
+            const members = membersData
+                .filter(m => m.role.toLowerCase() === 'member')
+                .sort((a, b) => a.name.localeCompare(b.name));
             
             leaderContainer.innerHTML = '';
             membersContainer.innerHTML = '';
@@ -92,18 +111,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // --- ฟังก์ชันสำหรับเริ่มการทำงานของ Search, Pagination ---
     function initializePageFunctionality() {
         const searchInput = document.getElementById('searchInput');
-        // FIX: ค้นหาการ์ด member จาก container ที่ถูกต้อง
-        const memberCards = Array.from(membersContainer.querySelectorAll('.member-card'));
+        const memberCards = Array.from(document.querySelectorAll('#members-section .member-card'));
         
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const pageInfo = document.getElementById('pageInfo');
         const paginationControls = document.querySelector('.pagination-controls');
         const leaderSection = document.getElementById('leader-section');
-        const itemsPerPage = 10;
+        const itemsPerPage = config.itemsPerPage;
         let currentPage = 1;
         
         function updateView() {
@@ -116,8 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
             
-            // ซ่อนการ์ดทั้งหมดก่อน
-            filteredCards.forEach(card => card.style.display = 'none');
+            memberCards.forEach(card => card.style.display = 'none');
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -129,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isSearching || currentPage > 1) {
                 leaderSection.style.display = 'none';
             } else {
-                leaderSection.style.display = 'block';
+                leaderSection.style.display = 'grid';
             }
 
             if (totalPages > 1) {
@@ -147,7 +163,6 @@ document.addEventListener('DOMContentLoaded', function () {
             updateView(); 
         });
 
-        // --- FIX: ลบเงื่อนไข if ที่ซ้ำซ้อนและทำงานผิดพลาดออก ---
         nextBtn.addEventListener('click', () => { 
             currentPage++; 
             updateView(); 

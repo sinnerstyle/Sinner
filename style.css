@@ -1,15 +1,17 @@
 :root {
+    /* --- COLORS --- */
     --color-background: #0a0a0a;
     --color-surface: #1a1a1a;
     --color-primary-text: #f5f5f5;
     --color-secondary-text: #888;
     --color-accent: #ffffff;
-    --color-accent-danger: #990000; /* Crimson Red for hover */
+    --color-accent-danger: #990000;
     --color-border: #333;
     --font-family: 'Kanit', sans-serif;
-    --shadow-light: rgba(0, 0, 0, 0.2);
-    --shadow-medium: rgba(0, 0, 0, 0.5);
-    --shadow-glow: rgba(255, 255, 255, 0.05);
+
+    /* --- LAYOUT SETTINGS (ปรับแต่งหน้าตาเว็บที่นี่) --- */
+    --container-max-width: 950px; /* ความกว้างสูงสุดสำหรับ 3 คอลัมน์ */
+    --card-min-height: 90px;
 }
 
 * {
@@ -18,12 +20,10 @@
     box-sizing: border-box;
 }
 
-/* --- General Styles --- */
 body {
     font-family: var(--font-family);
     background-color: var(--color-background);
     color: var(--color-primary-text);
-    transition: background-color 0.3s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -47,7 +47,6 @@ footer {
     to   { opacity: 0; }
 }
 
-/* --- Landing Page --- */
 #landing-page {
     display: flex;
     flex-direction: column;
@@ -67,8 +66,7 @@ footer {
 }
 
 #landing-page .logo {
-    /* CHANGED: ปรับขนาดโลโก้ */
-    max-width: 220px; 
+    max-width: 220px;
     margin-bottom: 20px;
 }
 
@@ -92,25 +90,22 @@ footer {
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 15px var(--shadow-light);
 }
 
 #landing-page .enter-button:hover {
     background-color: var(--color-accent);
     color: var(--color-background);
     border-color: var(--color-accent);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
     transform: translateY(-3px);
 }
 
-/* --- Members Page --- */
 #members-page {
     display: none;
     padding: 20px;
 }
 
 .container {
-    max-width: 700px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
     padding: 20px;
 }
@@ -121,11 +116,9 @@ header {
 }
 
 header .logo {
-    /* CHANGED: ปรับขนาดโลโก้ */
-    max-width: 180px; 
+    max-width: 180px;
 }
 
-/* Search Box */
 .search-container {
     position: relative;
     margin-bottom: 50px;
@@ -141,7 +134,7 @@ header .logo {
 
 #searchInput {
     width: 100%;
-    padding: 12px 15px 12px 45px; /* left padding for icon */
+    padding: 12px 15px 12px 45px;
     border-radius: 8px;
     border: 1px solid var(--color-border);
     background-color: var(--color-surface);
@@ -154,21 +147,23 @@ header .logo {
 #searchInput:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 15px var(--shadow-glow);
 }
 
-/* Member Section & Cards */
 .member-section {
     margin-bottom: 40px;
+    display: grid;
+    /* grid-template-columns ถูกย้ายไปกำหนดใน script.js แล้ว */
+    gap: 15px;
 }
 
 .member-section h2 {
+    grid-column: 1 / -1;
     font-size: 22px;
     font-weight: 500;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--color-primary-text);
-    margin-bottom: 25px;
+    margin-bottom: 10px; 
     padding-bottom: 10px;
     border-bottom: 1px solid var(--color-border);
     display: flex;
@@ -182,16 +177,14 @@ header .logo {
     background-color: var(--color-surface);
     padding: 15px;
     border-radius: 8px;
-    margin-bottom: 15px;
     border: 1px solid var(--color-border);
-    box-shadow: 0 5px 15px var(--shadow-light);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease;
     animation: fadeIn 0.5s ease-out forwards;
+    min-height: var(--card-min-height);
 }
 
 .member-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px var(--shadow-medium);
     border-color: var(--color-secondary-text);
 }
 
@@ -233,6 +226,7 @@ header .logo {
     color: var(--color-secondary-text);
     text-decoration: none;
     transition: color 0.2s;
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -256,7 +250,6 @@ header .logo {
     transform: scale(1.1);
 }
 
-/* Pagination */
 .pagination-controls {
     display: flex;
     justify-content: center;
@@ -294,7 +287,6 @@ header .logo {
     font-weight: 500;
 }
 
-/* --- Audio Player --- */
 #audio-player-container {
     position: fixed;
     bottom: 20px;
@@ -306,7 +298,6 @@ header .logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 4px 15px var(--shadow-medium);
     transition: all 0.3s ease;
 }
 
@@ -367,4 +358,15 @@ header .logo {
 }
 #volume-slider:hover::-moz-range-thumb {
     background-color: var(--color-accent);
+}
+
+@media (max-width: 600px) {
+    .member-section {
+        /* On mobile, force 1 column, overriding the JS setting */
+        grid-template-columns: 1fr !important;
+    }
+
+    .container {
+        padding: 10px;
+    }
 }
