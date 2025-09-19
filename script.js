@@ -1,28 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    // --- CONFIGURATION (ปรับแต่งหน้าตาและการทำงานของเว็บที่นี่) ---
+    // --- CONFIGURATION ---
     const config = {
-        // Link ของ Google Sheet ที่เผยแพร่เป็น CSV
         sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThs9RopNxmax2tjqFBvjU3QdA07hISEzwOTL9uMsfolujSimOZMN6md3mdGoq0FXZqiX6TCgqK3Os5/pub?output=csv',
-        
-        // จำนวนคอลัมน์ (จำนวนคนในแต่ละแถว)
         columnsPerRow: 2,
-
-        // จำนวนสมาชิกทั้งหมดที่จะแสดงในแต่ละหน้า (จะถูกนำไปคำนวณเป็นจำนวนแถว)
-        // เช่น 15 หาร 3 คอลัมน์ = 5 แถว
         itemsPerPage: 12 
     };
     // --- END CONFIGURATION ---
 
-
-    // --- Apply Layout Settings from Config ---
-    // โค้ดส่วนนี้จะนำค่าจาก config ไปสั่งให้ CSS ทำงาน
     const memberSections = document.querySelectorAll('.member-section');
     memberSections.forEach(section => {
         section.style.gridTemplateColumns = `repeat(${config.columnsPerRow}, 1fr)`;
     });
-    // --- End Apply Layout ---
-
 
     const landingPage = document.getElementById('landing-page');
     const membersPage = document.getElementById('members-page');
@@ -51,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="${cardClass}" data-name="${name}">
                 <img src="${pictureLink}" alt="Profile of ${name}" class="profile-pic">
                 <div class="member-info">
-                    <h3 class="memberName">${name}</h3>
+                    <h3>${name}</h3>
                     <a href="${facebookLink}" target="_blank" rel="noopener noreferrer">${shortLink}</a>
                 </div>
                 <a href="${facebookLink}" target="_blank" rel="noopener noreferrer" class="profile-link"><i class="fab fa-facebook-f"></i></a>
@@ -79,99 +68,98 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
             }).filter(m => m.name);
 
-            const leaders = membersData
-                .filter(m => m.role.toLowerCase() === 'leader');
-
-            const members = membersData
-                .filter(m => m.role.toLowerCase() === 'member')
-                .sort((a, b) => a.name.localeCompare(b.name));
+            const leaders = membersData.filter(m => m.role.toLowerCase() === 'leader');
+            const members = membersData.filter(m => m.role.toLowerCase() === 'member').sort((a, b) => a.name.localeCompare(b.name));
             
             leaderContainer.innerHTML = '';
             membersContainer.innerHTML = '';
 
             if (leaders.length > 0) {
                 const leadersHTML = leaders.map(leader => createMemberCardHTML(leader, true)).join('');
-                leaderContainer.innerHTML = '<h2>👑 LEADER</h2>' + leadersHTML;
+                leaderContainer.innerHTML = '<h2><i class="fa-solid fa-crown"></i> LEADER</h2>' + leadersHTML;
             }
 
             if (members.length > 0) {
                 const membersHTML = members.map(member => createMemberCardHTML(member)).join('');
-                membersContainer.innerHTML = '<h2><i class="fas fa-users"></i> MEMBERS</h2>' + membersHTML;
+                membersContainer.innerHTML = '<h2><i class="fa-solid fa-users-gear"></i> MEMBERS</h2>' + membersHTML;
             } else {
-                membersContainer.innerHTML = '<h2><i class="fas fa-users"></i> MEMBERS</h2><p>No members found.</p>';
+                membersContainer.innerHTML = '<h2><i class="fa-solid fa-users-gear"></i> MEMBERS</h2><p>No members found.</p>';
             }
             
             loadingMessage.style.display = 'none';
             initializePageFunctionality();
 
         } catch (error) {
-            console.error('Error fetching or parsing sheet data:', error);
+            console.error('Error fetching/parsing data:', error);
             loadingMessage.style.display = 'none';
-            membersContainer.innerHTML = '<h2>⚔️ MEMBERS</h2><p>Error loading data. Please check the Google Sheet link and publish settings.</p>';
+            membersContainer.innerHTML = '<h2>Error</h2><p>Error loading data. Please check settings.</p>';
         }
     }
     
     function initializePageFunctionality() {
         const searchInput = document.getElementById('searchInput');
-        const memberCards = Array.from(document.querySelectorAll('#members-section .member-card'));
+        const allCards = Array.from(document.querySelectorAll('.member-card'));
+        const paginationControls = document.querySelector('.pagination-controls');
         
+        // --- 3D Hover Effect ---
+        allCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const rotateY = -1 * ((x - rect.width / 2) / (rect.width / 2)) * 8; // Max rotation 8deg
+                const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * 8;
+                card.style.transform = `translateY(-5px) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const pageInfo = document.getElementById('pageInfo');
-        const paginationControls = document.querySelector('.pagination-controls');
-        const leaderSection = document.getElementById('leader-section');
         const itemsPerPage = config.itemsPerPage;
         let currentPage = 1;
-        
+
         function updateView() {
             const filterText = searchInput.value.toLowerCase();
-            
-            const filteredCards = memberCards.filter(card => {
-                const memberName = card.dataset.name.toLowerCase();
-                return memberName.includes(filterText);
-            });
-
+            const filteredCards = allCards.filter(card => card.dataset.name.toLowerCase().includes(filterText));
             const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-            
-            memberCards.forEach(card => card.style.display = 'none');
+
+            allCards.forEach(card => card.style.display = 'none');
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            
             const cardsToShow = filteredCards.slice(startIndex, endIndex);
             cardsToShow.forEach(card => card.style.display = 'flex');
-             
-            const isSearching = filterText.length > 0;
-            if (isSearching || currentPage > 1) {
-                leaderSection.style.display = 'none';
-            } else {
-                leaderSection.style.display = 'grid';
-            }
 
             if (totalPages > 1) {
                 paginationControls.style.display = 'flex';
-                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+                pageInfo.textContent = `${currentPage} / ${totalPages}`;
                 prevBtn.disabled = (currentPage === 1);
                 nextBtn.disabled = (currentPage >= totalPages);
             } else {
                 paginationControls.style.display = 'none';
             }
+
+            // --- ซ่อน/แสดงหัวข้อตอนค้นหา ---
+            const leaderHeading = document.querySelector('#leader-section h2');
+            const membersHeading = document.querySelector('#members-section h2');
+
+            if (leaderHeading) {
+                const hasVisibleLeaders = !!document.querySelector('#leader-section .member-card[style*="display: flex"]');
+                leaderHeading.style.display = hasVisibleLeaders ? 'flex' : 'none';
+            }
+            if (membersHeading) {
+                const hasVisibleMembers = !!document.querySelector('#members-section .member-card[style*="display: flex"]');
+                membersHeading.style.display = hasVisibleMembers ? 'flex' : 'none';
+            }
         }
 
-        searchInput.addEventListener('input', () => { 
-            currentPage = 1; 
-            updateView(); 
-        });
-
-        nextBtn.addEventListener('click', () => { 
-            currentPage++; 
-            updateView(); 
-        });
-
-        prevBtn.addEventListener('click', () => { 
-            currentPage--; 
-            updateView(); 
-        });
+        searchInput.addEventListener('input', () => { currentPage = 1; updateView(); });
+        nextBtn.addEventListener('click', () => { if(currentPage < Math.ceil(allCards.filter(c => c.dataset.name.toLowerCase().includes(searchInput.value.toLowerCase())).length / itemsPerPage)) currentPage++; updateView(); });
+        prevBtn.addEventListener('click', () => { if(currentPage > 1) currentPage--; updateView(); });
         
         updateView();
     }
@@ -184,38 +172,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const muteIcon = muteBtn.querySelector('i');
         const volumeSlider = document.getElementById('volume-slider');
 
-        playPauseBtn.addEventListener('click', () => {
-            audio.paused ? audio.play() : audio.pause();
-        });
-
-        audio.addEventListener('play', () => {
-            playIcon.classList.replace('fa-play', 'fa-pause');
-        });
-
-        audio.addEventListener('pause', () => {
-            playIcon.classList.replace('fa-pause', 'fa-play');
-        });
-
+        playPauseBtn.addEventListener('click', () => audio.paused ? audio.play() : audio.pause());
+        audio.addEventListener('play', () => playIcon.classList.replace('fa-play', 'fa-pause'));
+        audio.addEventListener('pause', () => playIcon.classList.replace('fa-pause', 'fa-play'));
         volumeSlider.addEventListener('input', (e) => {
             audio.volume = e.target.value;
-            audio.muted = false;
+            audio.muted = e.target.value == 0;
         });
-
         audio.addEventListener('volumechange', () => {
             volumeSlider.value = audio.volume;
-            if (audio.muted || audio.volume === 0) {
-                muteIcon.className = 'fas fa-volume-xmark';
-            } else if (audio.volume < 0.5) {
-                muteIcon.className = 'fas fa-volume-low';
-            } else {
-                muteIcon.className = 'fas fa-volume-high';
-            }
+            if (audio.muted || audio.volume === 0) muteIcon.className = 'fas fa-volume-xmark';
+            else if (audio.volume < 0.5) muteIcon.className = 'fas fa-volume-low';
+            else muteIcon.className = 'fas fa-volume-high';
         });
-        
-        muteBtn.addEventListener('click', () => {
-            audio.muted = !audio.muted;
-        });
-        
+        muteBtn.addEventListener('click', () => audio.muted = !audio.muted);
         audio.volume = 0.1;
     }
 
@@ -227,12 +197,17 @@ document.addEventListener('DOMContentLoaded', function () {
             membersPage.style.animation = 'fadeIn 1s forwards';
             
             const audio = document.getElementById('gang-music');
+            const playIcon = document.querySelector('#play-pause-btn i');
+            
             const playPromise = audio.play();
             if (playPromise !== undefined) {
-                playPromise.catch(error => {
+                playPromise.then(() => {
+                    playIcon.classList.replace('fa-play', 'fa-pause');
+                }).catch(error => {
                     console.error("Autoplay was prevented:", error);
                 });
             }
+
             fetchAndDisplayMembers();
         }, 500);
     });
