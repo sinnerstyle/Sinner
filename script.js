@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const landingPage = document.getElementById('landing-page');
     const membersPage = document.getElementById('members-page');
     const enterBtn = document.getElementById('enter-btn');
+    const backToHomeBtn = document.getElementById('back-to-home-btn');
     const leaderContainer = document.querySelector('#leader-section');
     const membersContainer = document.querySelector('#members-section');
     const loadingMessage = document.getElementById('loading-message');
@@ -209,6 +210,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             fetchAndDisplayMembers();
+        }, 500);
+    });
+
+    backToHomeBtn.addEventListener('click', () => {
+        membersPage.style.animation = 'fadeOut 0.5s forwards';
+        setTimeout(() => {
+            membersPage.style.display = 'none';
+            landingPage.style.display = 'flex';
+            landingPage.style.animation = 'fadeIn 1s forwards';
+            const audio = document.getElementById('gang-music');
+            if (!audio.paused) {
+                audio.pause();
+            }
         }, 500);
     });
     

@@ -144,6 +144,7 @@ body {
 header {
     text-align: center;
     margin-bottom: 50px;
+    position: relative; /* เพิ่มเพื่อให้สามารถกำหนดตำแหน่งของปุ่มได้ */
 }
 
 header .logo {
@@ -407,9 +408,39 @@ footer #audio-player-container p {
     box-shadow: 0 0 10px var(--color-accent-glow);
 }
 
+/* New CSS for Back Button */
+.back-button {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-accent);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+}
+
+.back-button:hover {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--color-accent-glow);
+}
+
 @media (max-width: 600px) {
     .member-section {
         grid-template-columns: 1fr !important;
     }
     .container { padding: 10px; }
+    .back-button {
+        position: static;
+        margin-bottom: 20px;
+    }
 }
